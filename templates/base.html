@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Quiz System{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <a href="{% url 'home' %}" class="navbar-brand">🎓 QuizMaster</a>
+            <ul class="navbar-menu">
+                {% if user.is_authenticated %}
+                    {% if user.is_superuser %}
+                        <li><a href="{% url 'admin:index' %}">Admin Panel</a></li>
+                    {% elif user.is_staff %}
+                        <li><a href="{% url 'trainer:dashboard' %}">Dashboard</a></li>
+                        <li><a href="{% url 'trainer:create_quiz' %}">Create Quiz</a></li>
+                        <li><a href="{% url 'trainer:manage_students' %}">Students</a></li>
+                    {% else %}
+                        <li><a href="{% url 'progress:dashboard' %}">Dashboard</a></li>
+                        <li><a href="{% url 'quiz:quiz_list' %}">Quizzes</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'accounts:profile' %}">Profile</a></li>
+                    <li><a href="{% url 'accounts:logout' %}" class="btn btn-danger btn-sm">Logout</a></li>
+                {% else %}
+                    <li><a href="{% url 'accounts:login' %}" class="btn btn-primary btn-sm">Login</a></li>
+                    <li><a href="{% url 'accounts:register_student' %}" class="btn btn-secondary btn-sm">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        {% if messages %}
+            <div class="container" style="margin-top: 2rem;">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{% static 'js/quiz.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

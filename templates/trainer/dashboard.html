@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Trainer Dashboard{% endblock %}
+
+{% block content %}
+<div style="padding: 4rem 0;">
+    <div class="container">
+        <h1 style="color: white; margin-bottom: 2rem;">👨‍🏫 Trainer Dashboard</h1>
+
+        <!-- Statistics -->
+        <div class="grid grid-4" style="margin-bottom: 2rem;">
+            <div class="stats-card">
+                <div class="stats-icon">👥</div>
+                <div class="stats-number">{{ total_students }}</div>
+                <div class="stats-label">Total Students</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-icon">✅</div>
+                <div class="stats-number">{{ active_students }}</div>
+                <div class="stats-label">Active Students</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-icon">📚</div>
+                <div class="stats-number">{{ total_quizzes }}</div>
+                <div class="stats-label">Total Quizzes</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-icon">📝</div>
+                <div class="stats-number">{{ total_attempts }}</div>
+                <div class="stats-label">Quiz Attempts</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-header">
+                <h3>⚡ Quick Actions</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-3">
+                    <a href="{% url 'trainer:create_quiz' %}" class="btn btn-primary btn-lg">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">➕</div>
+                        Create New Quiz
+                    </a>
+                    <a href="{% url 'trainer:manage_quizzes' %}" class="btn btn-info btn-lg">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📚</div>
+                        Manage Quizzes
+                    </a>
+                    <a href="{% url 'trainer:manage_students' %}" class="btn btn-secondary btn-lg">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">👥</div>
+                        Manage Students
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Student Attempts -->
+        <div class="card">
+            <div class="card-header">
+                <h3>📊 Recent Student Attempts</h3>
+            </div>
+            <div class="card-body">
+                {% if recent_attempts %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Quiz</th>
+                                <th>Score</th>
+                                <th>Percentage</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attempt in recent_attempts %}
+                            <tr>
+                                <td>{{ attempt.student.get_full_name }}</td>
+                                <td>{{ attempt.quiz.title }}</td>
+                                <td>{{ attempt.score }}/{{ attempt.total_marks }}</td>
+                                <td><strong>{{ attempt.percentage|floatformat:1 }}%</strong></td>
+                                <td>
+                                    {% if attempt.is_passed %}
+                                    <span class="badge badge-success">✓ Passed</span>
+                                    {% else %}
+                                    <span class="badge badge-danger">✗ Failed</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ attempt.end_time|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'quiz:quiz_result' attempt.id %}" class="btn btn-sm btn-info">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 3rem; color: #6b7280;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
+                    <p>No student attempts yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

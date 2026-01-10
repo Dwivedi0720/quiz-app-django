@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Quiz{% endblock %}
+
+{% block content %}
+<div style="padding: 4rem 0;">
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>➕ Create New Quiz</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <!-- Quiz Details -->
+                    <div class="form-group">
+                        <label class="form-label">Quiz Title</label>
+                        {{ quiz_form.title }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        {{ quiz_form.description }}
+                    </div>
+                    
+                    <div class="grid grid-3">
+                        <div class="form-group">
+                            <label class="form-label">Difficulty</label>
+                            {{ quiz_form.difficulty }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Pass Percentage</label>
+                            {{ quiz_form.pass_percentage }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Active</label>
+                            <div class="form-check">
+                                {{ quiz_form.is_active }}
+                                <label>Make quiz available to students</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr style="margin: 2rem 0;">
+
+                    <!-- Questions -->
+                    <h3 style="margin-bottom: 1.5rem;">📝 Add Questions</h3>
+                    
+                    {{ question_formset.management_form }}
+                    
+                    <div id="questions-container">
+                        {% for form in question_formset %}
+                        <div class="card" style="margin-bottom: 1.5rem; border: 2px solid var(--light);">
+                            <div style="background: var(--light); padding: 1rem; border-radius: 10px 10px 0 0;">
+                                <h4>Question {{ forloop.counter }}</h4>
+                            </div>
+                            <div style="padding: 1.5rem;">
+                                <div class="form-group">
+                                    <label class="form-label">Question Text</label>
+                                    {{ form.question_text }}
+                                </div>
+                                
+                                <div class="grid grid-2">
+                                    <div class="form-group">
+                                        <label class="form-label">Option A</label>
+                                        {{ form.option_a }}
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Option B</label>
+                                        {{ form.option_b }}
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Option C</label>
+                                        {{ form.option_c }}
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Option D</label>
+                                        {{ form.option_d }}
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-3">
+                                    <div class="form-group">
+                                        <label class="form-label">Correct Answer</label>
+                                        {{ form.correct_answer }}
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Marks</label>
+                                        {{ form.marks }}
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Time Limit (seconds)</label>
+                                        {{ form.time_limit }}
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Explanation (Optional)</label>
+                                    {{ form.explanation }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary btn-lg">Create Quiz 🚀</button>
+                        <a href="{% url 'trainer:dashboard' %}" class="btn btn-secondary btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

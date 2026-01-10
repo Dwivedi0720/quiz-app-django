@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div style="padding: 4rem 0;">
+    <div class="container">
+        <div style="max-width: 600px; margin: 0 auto;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>👤 My Profile</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label class="form-label">First Name</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Last Name</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                        
+                        {% if user.student_profile %}
+                        <div class="form-group">
+                            <label class="form-label">Enrollment Number</label>
+                            <input type="text" class="form-control" value="{{ user.student_profile.enrollment_number }}" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="text" name="phone" class="form-control" value="{{ user.student_profile.phone }}">
+                        </div>
+                        {% endif %}
+                        
+                        {% if user.trainer_profile %}
+                        <div class="form-group">
+                            <label class="form-label">Employee ID</label>
+                            <input type="text" class="form-control" value="{{ user.trainer_profile.employee_id }}" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="text" name="phone" class="form-control" value="{{ user.trainer_profile.phone }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Specialization</label>
+                            <input type="text" name="specialization" class="form-control" value="{{ user.trainer_profile.specialization }}">
+                        </div>
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

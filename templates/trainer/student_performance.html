@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Performance{% endblock %}
+
+{% block content %}
+<div style="padding: 4rem 0;">
+    <div class="container">
+        <h1 style="color: white; margin-bottom: 2rem;">📊 {{ student.get_full_name }}'s Performance</h1>
+
+        <!-- Overall Stats -->
+        <div class="grid grid-4" style="margin-bottom: 2rem;">
+            <div class="stats-card">
+                <div class="stats-icon">📝</div>
+                <div class="stats-number">{{ overall_progress.total_quizzes_attempted }}</div>
+                <div class="stats-label">Total Attempts</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-icon">✅</div>
+                <div class="stats-number">{{ overall_progress.total_quizzes_passed }}</div>
+                <div class="stats-label">Passed</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-icon">❌</div>
+                <div class="stats-number">{{ overall_progress.total_quizzes_failed }}</div>
+                <div class="stats-label">Failed</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-icon">🎯</div>
+                <div class="stats-number">{{ overall_progress.overall_percentage|floatformat:1 }}%</div>
+                <div class="stats-label">Average</div>
+            </div>
+        </div>
+
+        <!-- Recent Attempts -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Recent Quiz Attempts</h3>
+            </div>
+            <div class="card-body">
+                {% if attempts %}
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Quiz</th>
+                                <th>Score</th>
+                                <th>Percentage</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attempt in attempts %}
+                            <tr>
+                                <td>{{ attempt.quiz.title }}</td>
+                                <td>{{ attempt.score }}/{{ attempt.total_marks }}</td>
+                                <td><strong>{{ attempt.percentage|floatformat:1 }}%</strong></td>
+                                <td>
+                                    {% if attempt.is_passed %}
+                                    <span class="badge badge-success">Passed</span>
+                                    {% else %}
+                                    <span class="badge badge-danger">Failed</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ attempt.end_time|date:"M d, Y" }}</td>
+                                <td>
+                                    <a href="{% url 'quiz:quiz_result' attempt.id %}" class="btn btn-sm btn-info">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 3rem; color: #6b7280;">
+                    <p>No quiz attempts yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

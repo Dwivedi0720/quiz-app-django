@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div style="padding: 4rem 0;">
+    <div class="container">
+        <div style="max-width: 800px; margin: 0 auto;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>{{ quiz.title }}</h2>
+                    <span class="quiz-badge badge-{{ quiz.difficulty }}">{{ quiz.get_difficulty_display }}</span>
+                </div>
+                <div class="card-body">
+                    <p style="font-size: 1.1rem; margin-bottom: 2rem;">{{ quiz.description }}</p>
+                    
+                    <div class="grid grid-2" style="margin-bottom: 2rem;">
+                        <div style="padding: 1.5rem; background: var(--light); border-radius: 10px;">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📝</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--primary);">{{ quiz.total_questions }}</div>
+                            <div style="color: #6b7280;">Questions</div>
+                        </div>
+                        <div style="padding: 1.5rem; background: var(--light); border-radius: 10px;">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--primary);">{{ quiz.total_marks }}</div>
+                            <div style="color: #6b7280;">Total Marks</div>
+                        </div>
+                        <div style="padding: 1.5rem; background: var(--light); border-radius: 10px;">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--primary);">{{ quiz.pass_percentage }}%</div>
+                            <div style="color: #6b7280;">Pass Percentage</div>
+                        </div>
+                        <div style="padding: 1.5rem; background: var(--light); border-radius: 10px;">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">⏱️</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">Timed</div>
+                            <div style="color: #6b7280;">Per Question</div>
+                        </div>
+                    </div>
+
+                    <div style="background: #fef3c7; border-left: 5px solid #f59e0b; padding: 1rem; border-radius: 10px; margin-bottom: 2rem;">
+                        <h4 style="margin-bottom: 0.5rem;">⚠️ Important Instructions:</h4>
+                        <ul style="margin-left: 1.5rem; line-height: 2;">
+                            <li>Each question has a time limit</li>
+                            <li>You can only attempt this quiz once</li>
+                            <li>Your progress will be saved automatically</li>
+                            <li>You'll see results and answers after submission</li>
+                            <li>Don't refresh the page during the quiz</li>
+                        </ul>
+                    </div>
+
+                    {% if has_attempted %}
+                    <div class="alert alert-info">
+                        You have already attempted this quiz. You can only attempt each quiz once.
+                    </div>
+                    <a href="{% url 'quiz:quiz_list' %}" class="btn btn-secondary" style="width: 100%;">Back to Quiz List</a>
+                    {% else %}
+                    <a href="{% url 'quiz:start_quiz' quiz.id %}" class="btn btn-primary btn-lg" style="width: 100%;">
+                        Start Quiz 🚀
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

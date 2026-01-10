@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Quiz{% endblock %}
+
+{% block content %}
+<div style="padding: 4rem 0;">
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>✏️ Edit Quiz: {{ quiz.title }}</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label class="form-label">Quiz Title</label>
+                        {{ form.title }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        {{ form.description }}
+                    </div>
+                    
+                    <div class="grid grid-3">
+                        <div class="form-group">
+                            <label class="form-label">Difficulty</label>
+                            {{ form.difficulty }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Pass Percentage</label>
+                            {{ form.pass_percentage }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Active</label>
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label>Make quiz available</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
+                        <a href="{% url 'trainer:manage_quizzes' %}" class="btn btn-secondary btn-lg">Cancel</a>
+                    </div>
+                </form>
+
+                <!-- Existing Questions -->
+                <hr style="margin: 2rem 0;">
+                <h3>Existing Questions</h3>
+                {% for question in questions %}
+                <div class="card" style="margin-bottom: 1rem; border: 2px solid var(--light);">
+                    <div style="padding: 1rem;">
+                        <strong>Q{{ question.order }}:</strong> {{ question.question_text|truncatewords:15 }}
+                        <div style="margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;">
+                            Correct: {{ question.correct_answer }} | Marks: {{ question.marks }} | Time: {{ question.time_limit }}s
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

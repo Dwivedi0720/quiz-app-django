@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Quiz System{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <h1>🎓 Welcome to QuizMaster</h1>
+        <p>Role-Based Online Quiz & Student Performance Tracking System</p>
+        
+        {% if not user.is_authenticated %}
+        <div class="hero-buttons">
+            <a href="{% url 'accounts:register_student' %}" class="btn btn-primary btn-lg">Register as Student</a>
+            <a href="{% url 'accounts:register_trainer' %}" class="btn btn-secondary btn-lg">Register as Trainer</a>
+            <a href="{% url 'accounts:login' %}" class="btn btn-outline btn-lg">Login</a>
+        </div>
+        {% else %}
+            {% if user.is_staff %}
+            <div class="hero-buttons">
+                <a href="{% url 'trainer:dashboard' %}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+                <a href="{% url 'trainer:create_quiz' %}" class="btn btn-success btn-lg">Create Quiz</a>
+            </div>
+            {% else %}
+            <div class="hero-buttons">
+                <a href="{% url 'progress:dashboard' %}" class="btn btn-primary btn-lg">View Dashboard</a>
+                <a href="{% url 'quiz:quiz_list' %}" class="btn btn-success btn-lg">Browse Quizzes</a>
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</section>
+
+<section style="padding: 4rem 0;">
+    <div class="container">
+        <h2 style="text-align: center; color: white; margin-bottom: 3rem; font-size: 2rem;">✨ Key Features</h2>
+        <div class="grid grid-3">
+            <div class="card text-center">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">👨‍🎓</div>
+                <h3>Student Portal</h3>
+                <p>Take quizzes, track performance, and monitor daily progress</p>
+            </div>
+            <div class="card text-center">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">👨‍🏫</div>
+                <h3>Trainer Dashboard</h3>
+                <p>Create quizzes, manage students, and monitor their performance</p>
+            </div>
+            <div class="card text-center">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">⏱️</div>
+                <h3>Timed Quizzes</h3>
+                <p>Individual time limits for each question with automatic submission</p>
+            </div>
+            <div class="card text-center">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                <h3>Performance Analytics</h3>
+                <p>Detailed daily and overall progress tracking</p>
+            </div>
+            <div class="card text-center">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+                <h3>Instant Results</h3>
+                <p>View scores and correct answers immediately after submission</p>
+            </div>
+            <div class="card text-center">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔒</div>
+                <h3>Access Control</h3>
+                <p>Trainers can activate/deactivate student accounts</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
