@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Available Quizzes{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <!-- Page Heading -->
+    <div class="mb-4">
+        <h2>📚 Available Quizzes</h2>
+        <p class="text-muted">Select a quiz to start your assessment.</p>
+    </div>
+
+    {% if quizzes %}
+        <div class="grid grid-2">
+            {% for quiz in quizzes %}
+                <div class="quiz-card">
+
+                    <div class="quiz-header">
+                        <div>
+                            <h3 class="quiz-title">{{ quiz.title }}</h3>
+                            <span class="quiz-badge badge-{{ quiz.difficulty }}">
+                                {{ quiz.get_difficulty_display }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <p class="text-muted mb-2">
+                        {{ quiz.description|truncatewords:20 }}
+                    </p>
+
+                    <div class="quiz-meta">
+                        <div class="quiz-meta-item">
+                            <span>📝</span>
+                            <span>{{ quiz.total_questions }} Questions</span>
+                        </div>
+                        <div class="quiz-meta-item">
+                            <span>🎯</span>
+                            <span>{{ quiz.total_marks }} Marks</span>
+                        </div>
+                        <div class="quiz-meta-item">
+                            <span>✅</span>
+                            <span>Pass: {{ quiz.pass_percentage }}%</span>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'quiz:quiz_detail' quiz.id %}"
+                       class="btn btn-primary btn-sm mt-2"
+                       style="width:100%;">
+                        View Details
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <div class="card text-center mt-4">
+            <div style="font-size:3rem;">📭</div>
+            <h3>No Quizzes Available</h3>
+            <p class="text-muted">
+                There are no quizzes available at the moment. Please check back later.
+            </p>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

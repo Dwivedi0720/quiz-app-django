@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Manage Students{% endblock %}
+
+{% block content %}
+
+<style>
+/* ACTION COLUMN */
+.action-cell {
+    text-align: center;
+}
+
+/* BUTTON WRAPPER */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+/* COMMON BUTTON */
+.action-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+}
+
+/* TOGGLE BUTTON */
+.action-toggle {
+    color: #a855f7;
+    border: 1px solid #a855f7;
+    background: transparent;
+}
+
+.action-toggle:hover {
+    background: #a855f7;
+    color: #fff;
+}
+
+/* VIEW PERFORMANCE BUTTON */
+.action-view {
+    background: #38bdf8;
+    color: #000;
+    border: 1px solid #38bdf8;
+}
+
+.action-view:hover {
+    background: #0ea5e9;
+    border-color: #0ea5e9;
+}
+</style>
+
+<div class="container" style="max-width: 1200px; margin-top: 40px;">
+
+    <div class="card bg-dark text-light shadow-lg">
+        <div class="card-body">
+
+            <h2 class="mb-2">👨‍🎓 Manage Students</h2>
+            <p class="text-muted mb-4">Assign, activate or deactivate students</p>
+
+            <!-- ASSIGNED STUDENTS -->
+            <h4 class="mt-4">✅ Assigned Students</h4>
+
+            <div class="table-responsive mt-3">
+                <table class="table table-dark table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th style="min-width:260px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if students %}
+                            {% for student in students %}
+                            <tr>
+                                <td>{{ student.username }}</td>
+                                <td>{{ student.email }}</td>
+                                <td>
+                                    {% if student.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- ✅ FIXED ACTION CELL -->
+                                <td class="action-cell">
+                                    <div class="action-buttons">
+                                        <a href="{% url 'trainer:toggle_student_status' student.id %}"
+                                           class="action-btn action-toggle">
+                                            Toggle Status
+                                        </a>
+
+                                        <a href="{% url 'trainer:student_performance' student.id %}"
+                                           class="action-btn action-view">
+                                            View Performance
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">
+                                    No assigned students.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <hr class="my-5">
+
+            <!-- UNASSIGNED STUDENTS -->
+            <h4>➕ Unassigned Students</h4>
+
+            {% if unassigned %}
+                <ul class="list-group mt-3">
+                    {% for student in unassigned %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-dark text-light">
+                        {{ student.username }} ({{ student.email }})
+                        <a href="{% url 'trainer:assign_student' student.id %}"
+                           class="btn btn-success btn-sm">
+                            Assign
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted mt-2">No unassigned students available.</p>
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

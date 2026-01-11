@@ -5,41 +5,50 @@
 {% block content %}
 <div style="padding: 4rem 0;">
     <div class="container">
-        <h1 style="color: white; margin-bottom: 2rem;">📊 {{ student.get_full_name }}'s Performance</h1>
 
-        <!-- Overall Stats -->
+        <h1 style="color: white; margin-bottom: 2rem;">
+            📊 {{ student.get_full_name }}'s Performance
+        </h1>
+
+        <!-- OVERALL STATS -->
         <div class="grid grid-4" style="margin-bottom: 2rem;">
             <div class="stats-card">
                 <div class="stats-icon">📝</div>
                 <div class="stats-number">{{ overall_progress.total_quizzes_attempted }}</div>
                 <div class="stats-label">Total Attempts</div>
             </div>
+
             <div class="stats-card">
                 <div class="stats-icon">✅</div>
                 <div class="stats-number">{{ overall_progress.total_quizzes_passed }}</div>
                 <div class="stats-label">Passed</div>
             </div>
+
             <div class="stats-card">
                 <div class="stats-icon">❌</div>
                 <div class="stats-number">{{ overall_progress.total_quizzes_failed }}</div>
                 <div class="stats-label">Failed</div>
             </div>
+
             <div class="stats-card">
                 <div class="stats-icon">🎯</div>
-                <div class="stats-number">{{ overall_progress.overall_percentage|floatformat:1 }}%</div>
+                <div class="stats-number">
+                    {{ overall_progress.overall_percentage|floatformat:1 }}%
+                </div>
                 <div class="stats-label">Average</div>
             </div>
         </div>
 
-        <!-- Recent Attempts -->
+        <!-- RECENT ATTEMPTS -->
         <div class="card">
             <div class="card-header">
                 <h3>Recent Quiz Attempts</h3>
             </div>
+
             <div class="card-body">
                 {% if attempts %}
                 <div class="table-container">
-                    <table>
+                    <table class="performance-table">
                         <thead>
                             <tr>
                                 <th>Quiz</th>
@@ -47,25 +56,32 @@
                                 <th>Percentage</th>
                                 <th>Status</th>
                                 <th>Date</th>
-                                <th>Action</th>
+                                <th class="action-head">Action</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {% for attempt in attempts %}
                             <tr>
                                 <td>{{ attempt.quiz.title }}</td>
                                 <td>{{ attempt.score }}/{{ attempt.total_marks }}</td>
                                 <td><strong>{{ attempt.percentage|floatformat:1 }}%</strong></td>
+
                                 <td>
                                     {% if attempt.is_passed %}
-                                    <span class="badge badge-success">Passed</span>
+                                        <span class="badge badge-success">Passed</span>
                                     {% else %}
-                                    <span class="badge badge-danger">Failed</span>
+                                        <span class="badge badge-danger">Failed</span>
                                     {% endif %}
                                 </td>
+
                                 <td>{{ attempt.end_time|date:"M d, Y" }}</td>
-                                <td>
-                                    <a href="{% url 'quiz:quiz_result' attempt.id %}" class="btn btn-sm btn-info">View</a>
+
+                                <td class="action-cell">
+                                    <a href="{% url 'quiz:quiz_result' attempt.id %}"
+                                       class="action-view-btn">
+                                        View
+                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -73,12 +89,59 @@
                     </table>
                 </div>
                 {% else %}
-                <div style="text-align: center; padding: 3rem; color: #6b7280;">
-                    <p>No quiz attempts yet</p>
+                <div style="text-align:center; padding:3rem; color:#6b7280;">
+                    No quiz attempts yet
                 </div>
                 {% endif %}
             </div>
         </div>
+
     </div>
 </div>
+
+<!-- FORCE STYLES (DO NOT REMOVE) -->
+<style>
+.performance-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.performance-table th,
+.performance-table td {
+    padding: 14px 16px;
+    vertical-align: middle !important;
+}
+
+.action-head {
+    text-align: center !important;
+    min-width: 140px;
+}
+
+.action-cell {
+    text-align: center !important;
+}
+
+/* VIEW BUTTON */
+.action-view-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 6px 16px !important;
+    border: 1px solid #38bdf8 !important;
+    border-radius: 6px !important;
+
+    color: #38bdf8 !important;
+    background: transparent !important;
+    text-decoration: none !important;
+
+    font-size: 0.85rem !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.action-view-btn:hover {
+    background: #38bdf8 !important;
+    color: #000 !important;
+}
+</style>
 {% endblock %}

@@ -43,6 +43,10 @@
 
                     <div style="text-align: center; margin-top: 2rem;">
                         <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
+                        <a href="{% url 'trainer:edit_questions' quiz.id %}"
+   class="btn btn-outline-info mt-3">
+   ✏️ Edit Questions
+</a>
                         <a href="{% url 'trainer:manage_quizzes' %}" class="btn btn-secondary btn-lg">Cancel</a>
                     </div>
                 </form>

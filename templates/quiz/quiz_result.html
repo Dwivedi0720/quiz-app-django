@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Result{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <div class="result-card text-center">
+        <h2>🎯 Quiz Completed</h2>
+
+        <div class="result-score {% if is_passed %}pass{% else %}fail{% endif %}">
+            {{ attempt.percentage|floatformat:1 }}%
+        </div>
+
+        <h3>
+            {% if is_passed %}
+                🎉 Congratulations! You Passed!
+            {% else %}
+                😔 Better luck next time!
+            {% endif %}
+        </h3>
+
+        <div class="result-actions">
+            <a href="{% url 'progress:dashboard' %}" class="btn btn-primary">
+                Dashboard
+            </a>
+            <a href="{% url 'quiz:quiz_list' %}" class="btn btn-secondary">
+                More Quizzes
+            </a>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h3>📝 Review Answers</h3>
+        </div>
+        <div class="card-body">
+            {% for qa in questions_with_answers %}
+                <div class="mb-3">
+                    <strong>Q{{ forloop.counter }}.</strong>
+                    {{ qa.question.question_text }}
+
+                    <br>
+                    {% if qa.answer %}
+                        {% if qa.answer.is_correct %}
+                            <span class="badge badge-success">Correct</span>
+                        {% else %}
+                            <span class="badge badge-danger">Incorrect</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="badge badge-warning">Not Answered</span>
+                    {% endif %}
+                </div>
+                <hr>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Edit Questions{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1100px; margin-top: 40px;">
+
+    <h2 style="color:white; margin-bottom: 24px;">
+        ✏️ Edit Questions — {{ quiz.title }}
+    </h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {% for q in questions %}
+        <div class="question-card">
+
+            <h4 style="margin-bottom: 12px;">
+                Question {{ forloop.counter }}
+            </h4>
+
+            <div class="question-grid">
+
+                <!-- ✅ QUESTION TEXT (FIXED) -->
+                <input type="text"
+                       name="question_{{ q.id }}"
+                       value="{{ q.question_text }}"
+                       placeholder="Enter question"
+                       required>
+
+                <!-- OPTION A -->
+                <input type="text"
+                       name="option_a_{{ q.id }}"
+                       value="{{ q.option_a }}"
+                       placeholder="Option A"
+                       required>
+
+                <!-- OPTION B -->
+                <input type="text"
+                       name="option_b_{{ q.id }}"
+                       value="{{ q.option_b }}"
+                       placeholder="Option B"
+                       required>
+
+                <!-- OPTION C -->
+                <input type="text"
+                       name="option_c_{{ q.id }}"
+                       value="{{ q.option_c }}"
+                       placeholder="Option C"
+                       required>
+
+                <!-- OPTION D -->
+                <input type="text"
+                       name="option_d_{{ q.id }}"
+                       value="{{ q.option_d }}"
+                       placeholder="Option D"
+                       required>
+
+                <!-- CORRECT ANSWER -->
+                <select name="correct_{{ q.id }}" required>
+                    <option value="A" {% if q.correct_option == "A" %}selected{% endif %}>Correct: A</option>
+                    <option value="B" {% if q.correct_option == "B" %}selected{% endif %}>Correct: B</option>
+                    <option value="C" {% if q.correct_option == "C" %}selected{% endif %}>Correct: C</option>
+                    <option value="D" {% if q.correct_option == "D" %}selected{% endif %}>Correct: D</option>
+                </select>
+
+                <!-- TIME -->
+                <input type="number"
+                       name="time_{{ q.id }}"
+                       value="{{ q.time_limit }}"
+                       placeholder="Time (seconds)"
+                       min="5"
+                       required>
+
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- ACTION BUTTONS -->
+        <div style="display:flex; gap:16px; margin-top:32px;">
+            <button type="submit" class="btn btn-primary">
+                💾 Save Changes
+            </button>
+
+            <a href="{% url 'trainer:edit_quiz' quiz.id %}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+</div>
+
+<style>
+.question-card {
+    background: rgba(255,255,255,0.04);
+    padding: 20px;
+    border-radius: 14px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.question-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.question-grid input,
+.question-grid select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    background: #0b1220;
+    color: white;
+    border: 1px solid #1f2937;
+    font-size: 0.9rem;
+}
+
+.question-grid input::placeholder {
+    color: #9ca3af;
+}
+
+@media (max-width: 768px) {
+    .question-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+{% endblock %}

@@ -3,178 +3,144 @@
 {% block title %}Student Dashboard{% endblock %}
 
 {% block content %}
-<div style="padding: 4rem 0;">
+<div class="dashboard-wrapper">
     <div class="container">
-        <h1 style="color: white; margin-bottom: 2rem;">👨‍🎓 Welcome, {{ user.get_full_name }}</h1>
 
-        <!-- Overall Statistics -->
-        <div class="grid grid-4" style="margin-bottom: 2rem;">
+        <!-- PAGE TITLE -->
+        <h1 class="page-title">👨‍🎓 Student Dashboard</h1>
+
+        <!-- STATS -->
+        <div class="grid grid-4">
             <div class="stats-card">
                 <div class="stats-icon">📝</div>
                 <div class="stats-number">{{ overall_progress.total_quizzes_attempted }}</div>
                 <div class="stats-label">Total Quizzes</div>
             </div>
+
             <div class="stats-card">
                 <div class="stats-icon">✅</div>
                 <div class="stats-number">{{ overall_progress.total_quizzes_passed }}</div>
                 <div class="stats-label">Passed</div>
             </div>
+
             <div class="stats-card">
                 <div class="stats-icon">❌</div>
                 <div class="stats-number">{{ overall_progress.total_quizzes_failed }}</div>
                 <div class="stats-label">Failed</div>
             </div>
+
             <div class="stats-card">
                 <div class="stats-icon">🎯</div>
-                <div class="stats-number">{{ overall_progress.overall_percentage|floatformat:1 }}%</div>
-                <div class="stats-label">Avg Score</div>
+                <div class="stats-number">
+                    {{ overall_progress.overall_percentage|floatformat:1 }}%
+                </div>
+                <div class="stats-label">Average Score</div>
             </div>
         </div>
 
-        <div class="grid grid-2">
-            <!-- Performance Chart -->
+        <!-- CHART + RECENT -->
+        <div class="grid grid-2 mt-4">
+
+            <!-- PERFORMANCE CHART -->
             <div class="card">
-                <div class="card-header">
-                    <h3>📊 Performance Trend (Last 30 Days)</h3>
-                </div>
-                <div class="card-body">
-                    <canvas id="performanceChart" style="max-height: 300px;"></canvas>
-                </div>
+                <h3 class="card-title">📊 Performance Trend (Last 30 Days)</h3>
+                <canvas id="performanceChart" height="180"></canvas>
             </div>
 
-            <!-- Recent Activity -->
+            <!-- RECENT ATTEMPTS -->
             <div class="card">
-                <div class="card-header">
-                    <h3>📈 Recent Attempts</h3>
-                </div>
-                <div class="card-body">
-                    {% if recent_attempts %}
-                    <div style="max-height: 350px; overflow-y: auto;">
-                        {% for attempt in recent_attempts %}
-                        <div style="padding: 1rem; border-bottom: 1px solid var(--light); display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <div style="font-weight: 600;">{{ attempt.quiz.title }}</div>
-                                <div style="font-size: 0.875rem; color: #6b7280;">{{ attempt.end_time|date:"M d, Y - H:i" }}</div>
-                            </div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 1.5rem; font-weight: bold; color: {% if attempt.is_passed %}var(--success){% else %}var(--danger){% endif %};">
-                                    {{ attempt.percentage|floatformat:0 }}%
-                                </div>
-                                <a href="{% url 'quiz:quiz_result' attempt.id %}" class="btn btn-sm btn-info" style="margin-top: 0.5rem;">View</a>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div style="text-align: center; padding: 2rem; color: #6b7280;">
-                        <p>No attempts yet. Start taking quizzes!</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+                <h3 class="card-title">📈 Recent Attempts</h3>
 
-        <!-- Available Quizzes -->
-        {% if available_quizzes %}
-        <div class="card" style="margin-top: 2rem;">
-            <div class="card-header">
-                <h3>🚀 Available Quizzes</h3>
-            </div>
-            <div class="card-body">
-                <div class="grid grid-3">
-                    {% for quiz in available_quizzes %}
-                    <div class="quiz-card">
-                        <h4>{{ quiz.title }}</h4>
-                        <p style="color: #6b7280; font-size: 0.875rem;">{{ quiz.description|truncatewords:10 }}</p>
-                        <div style="display: flex; gap: 1rem; margin-top: 1rem; font-size: 0.875rem; color: #6b7280;">
-                            <span>📝 {{ quiz.total_questions }}Q</span>
-                            <span>🎯 {{ quiz.total_marks }}M</span>
+                {% if recent_attempts %}
+                    {% for attempt in recent_attempts %}
+                    <div class="recent-attempt-item">
+                        <div class="attempt-left">
+                            <h4>{{ attempt.quiz.title }}</h4>
+                            <span class="attempt-date">
+                                {{ attempt.end_time|date:"M d, Y - H:i" }}
+                            </span>
                         </div>
-                        <a href="{% url 'quiz:quiz_detail' quiz.id %}" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 1rem;">Start Quiz</a>
+
+                        <div class="attempt-right">
+                            <span class="attempt-score
+                                {% if attempt.is_passed %}score-pass{% else %}score-fail{% endif %}">
+                                {{ attempt.percentage|floatformat:0 }}%
+                            </span>
+
+                            <a href="{% url 'quiz:quiz_result' attempt.id %}"
+                               class="btn btn-outline btn-sm">
+                                View
+                            </a>
+                        </div>
                     </div>
                     {% endfor %}
-                </div>
-                <div style="text-align: center; margin-top: 1.5rem;">
-                    <a href="{% url 'quiz:quiz_list' %}" class="btn btn-secondary">View All Quizzes</a>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- Daily Progress -->
-        <div class="card" style="margin-top: 2rem;">
-            <div class="card-header">
-                <h3>📅 Daily Progress</h3>
-            </div>
-            <div class="card-body">
-                {% if daily_progress %}
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Attempts</th>
-                                <th>Passed</th>
-                                <th>Failed</th>
-                                <th>Avg %</th>
-                                <th>Time Spent</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for dp in daily_progress %}
-                            <tr>
-                                <td>{{ dp.date|date:"M d, Y" }}</td>
-                                <td>{{ dp.quizzes_attempted }}</td>
-                                <td style="color: var(--success);">{{ dp.quizzes_passed }}</td>
-                                <td style="color: var(--danger);">{{ dp.quizzes_failed }}</td>
-                                <td><strong>{{ dp.average_percentage|floatformat:1 }}%</strong></td>
-                                <td>{{ dp.time_spent|floatformat:0 }}s</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
                 {% else %}
-                <div style="text-align: center; padding: 2rem; color: #6b7280;">
-                    <p>No progress data yet.</p>
-                </div>
+                    <p class="empty-text">No quiz attempts yet.</p>
                 {% endif %}
             </div>
         </div>
+
+        <!-- DAILY PROGRESS -->
+        <div class="card mt-4">
+            <h3 class="card-title">📅 Daily Progress</h3>
+
+            {% if daily_progress %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Attempts</th>
+                            <th>Passed</th>
+                            <th>Failed</th>
+                            <th>Average %</th>
+                            <th>Time Spent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dp in daily_progress %}
+                        <tr>
+                            <td>{{ dp.date|date:"M d, Y" }}</td>
+                            <td>{{ dp.quizzes_attempted }}</td>
+                            <td class="text-success">{{ dp.quizzes_passed }}</td>
+                            <td class="text-danger">{{ dp.quizzes_failed }}</td>
+                            <td><strong>{{ dp.average_percentage|floatformat:1 }}%</strong></td>
+                            <td>{{ dp.time_spent|floatformat:0 }}s</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                <p class="empty-text">No daily progress data available.</p>
+            {% endif %}
+        </div>
+
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<!-- CHART JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('performanceChart').getContext('2d');
-    const chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: {{ chart_dates|safe }},
-            datasets: [{
-                label: 'Average Score %',
-                data: {{ chart_percentages|safe }},
-                borderColor: 'rgb(99, 102, 241)',
-                backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100
-                }
-            }
+const ctx = document.getElementById('performanceChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: {{ chart_dates|safe }},
+        datasets: [{
+            data: {{ chart_percentages|safe }},
+            borderColor: '#38bdf8',
+            backgroundColor: 'rgba(56,189,248,0.15)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, max: 100 }
         }
-    });
+    }
+});
 </script>
 {% endblock %}

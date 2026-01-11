@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ attempt.quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <!-- ================= QUIZ HEADER ================= -->
+    <div class="card mb-3">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2>{{ attempt.quiz.title }}</h2>
+
+            <div class="timer" id="overall-timer">
+                ⏱️ <span id="overall-time">00:00</span>
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-bar-container mt-2">
+            <div class="progress-bar" id="progress-bar" style="width: 0%;"></div>
+        </div>
+
+        <p class="text-center text-muted mt-1">
+            Question <span id="current-question">1</span> of {{ total_questions }}
+        </p>
+    </div>
+
+    <!-- ================= QUESTIONS ================= -->
+    <form id="quiz-form">
+        {% csrf_token %}
+
+        {% for question in questions %}
+        <div class="question-container"
+             id="question-{{ forloop.counter }}"
+             {% if forloop.counter > 1 %}style="display:none;"{% endif %}>
+
+            <!-- Question Header -->
+            <div class="question-header">
+                <div class="question-number">
+                    Question {{ forloop.counter }} of {{ total_questions }}
+                </div>
+
+                <div class="timer" id="timer-{{ forloop.counter }}">
+                    ⏱️ <span class="time-display">{{ question.time_limit }}</span>s
+                </div>
+            </div>
+
+            <!-- Question Text -->
+            <div class="question-text">
+                {{ question.question_text }}
+            </div>
+
+            <!-- Options -->
+            <div class="options">
+                <div class="option"
+                     data-answer="A"
+                     onclick="selectOption(this, {{ forloop.counter }}, {{ question.id }})">
+                    <div class="option-label">A</div>
+                    <span>{{ question.option_a }}</span>
+                </div>
+
+                <div class="option"
+                     data-answer="B"
+                     onclick="selectOption(this, {{ forloop.counter }}, {{ question.id }})">
+                    <div class="option-label">B</div>
+                    <span>{{ question.option_b }}</span>
+                </div>
+
+                <div class="option"
+                     data-answer="C"
+                     onclick="selectOption(this, {{ forloop.counter }}, {{ question.id }})">
+                    <div class="option-label">C</div>
+                    <span>{{ question.option_c }}</span>
+                </div>
+
+                <div class="option"
+                     data-answer="D"
+                     onclick="selectOption(this, {{ forloop.counter }}, {{ question.id }})">
+                    <div class="option-label">D</div>
+                    <span>{{ question.option_d }}</span>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="mt-3" style="display:flex; justify-content:space-between;">
+                {% if forloop.counter > 1 %}
+                    <button type="button"
+                            class="btn btn-outline"
+                            onclick="previousQuestion({{ forloop.counter }})">
+                        ← Previous
+                    </button>
+                {% else %}
+                    <div></div>
+                {% endif %}
+
+                {% if forloop.last %}
+                    <button type="button"
+                            class="btn btn-success"
+                            onclick="submitQuiz()">
+                        Submit Quiz 🎯
+                    </button>
+                {% else %}
+                    <button type="button"
+                            class="btn btn-primary"
+                            onclick="nextQuestion({{ forloop.counter }})">
+                        Next →
+                    </button>
+                {% endif %}
+            </div>
+
+        </div>
+        {% endfor %}
+    </form>
+
+</div>
+
+<!-- ================= JS (UNCHANGED) ================= -->
+<script>
+    const attemptId = {{ attempt.id }};
+    const totalQuestions = {{ total_questions }};
+    let currentQuestion = 1;
+    let questionTimers = {};
+    let questionStartTimes = {};
+    let overallStartTime = Date.now();
+    let answers = {};
+
+    {% for question in questions %}
+    questionTimers[{{ forloop.counter }}] = {{ question.time_limit }};
+    questionStartTimes[{{ forloop.counter }}] = Date.now();
+    {% endfor %}
+
+    function startQuestionTimer(questionNum) {
+        const timerDisplay = document.querySelector(`#timer-${questionNum} .time-display`);
+        const timerElement = document.getElementById(`timer-${questionNum}`);
+
+        const interval = setInterval(() => {
+            questionTimers[questionNum]--;
+            timerDisplay.textContent = questionTimers[questionNum];
+
+            if (questionTimers[questionNum] <= 10) {
+                timerElement.classList.add('danger');
+            } else if (questionTimers[questionNum] <= 30) {
+                timerElement.classList.add('warning');
+            }
+
+            if (questionTimers[questionNum] <= 0) {
+                clearInterval(interval);
+                if (questionNum < totalQuestions) nextQuestion(questionNum);
+                else submitQuiz();
+            }
+        }, 1000);
+
+        return interval;
+    }
+
+    function startOverallTimer() {
+        setInterval(() => {
+            const elapsed = Math.floor((Date.now() - overallStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('overall-time').textContent =
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }, 1000);
+    }
+
+    let currentInterval = startQuestionTimer(1);
+    startOverallTimer();
+
+    function selectOption(element, questionNum, questionId) {
+        const container = document.getElementById(`question-${questionNum}`);
+        container.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+        element.classList.add('selected');
+
+        const answer = element.getAttribute('data-answer');
+        const timeTaken = Math.floor((Date.now() - questionStartTimes[questionNum]) / 1000);
+
+        answers[questionId] = {answer, timeTaken};
+
+        fetch(`/quiz/attempt/${attemptId}/submit-answer/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                question_id: questionId,
+                answer: answer,
+                time_taken: timeTaken
+            })
+        });
+    }
+
+    function nextQuestion(current) {
+        clearInterval(currentInterval);
+        document.getElementById(`question-${current}`).style.display = 'none';
+        currentQuestion = current + 1;
+        document.getElementById(`question-${currentQuestion}`).style.display = 'block';
+        document.getElementById('current-question').textContent = currentQuestion;
+
+        document.getElementById('progress-bar').style.width =
+            (currentQuestion / totalQuestions) * 100 + '%';
+
+        questionStartTimes[currentQuestion] = Date.now();
+        currentInterval = startQuestionTimer(currentQuestion);
+    }
+
+    function previousQuestion(current) {
+        clearInterval(currentInterval);
+        document.getElementById(`question-${current}`).style.display = 'none';
+        currentQuestion = current - 1;
+        document.getElementById(`question-${currentQuestion}`).style.display = 'block';
+        document.getElementById('current-question').textContent = currentQuestion;
+
+        currentInterval = startQuestionTimer(currentQuestion);
+    }
+
+    function submitQuiz() {
+        if (confirm('Are you sure you want to submit the quiz?')) {
+            clearInterval(currentInterval);
+            window.location.href = `/quiz/attempt/${attemptId}/submit/`;
+        }
+    }
+</script>
+{% endblock %}

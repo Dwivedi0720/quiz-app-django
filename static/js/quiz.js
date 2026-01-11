@@ -1,36 +1,63 @@
-// Quiz timer and interaction functions
+// ================================
+// QUIZ INTERACTION & SAFETY LOGIC
+// ================================
 
-// Prevent right-click during quiz
-if (window.location.pathname.includes('/quiz/attempt/')) {
-    document.addEventListener('contextmenu', event => event.preventDefault());
-    
-    // Warn on page leave
-    window.addEventListener('beforeunload', function (e) {
-        e.preventDefault();
-        e.returnValue = '';
-    });
-}
+// Disable right-click & warn on leave during quiz attempt
+document.addEventListener("DOMContentLoaded", () => {
 
-// Smooth scroll
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
+    const isQuizAttempt = window.location.pathname.includes("/quiz/attempt/");
+
+    if (isQuizAttempt) {
+        // Disable right click
+        document.addEventListener("contextmenu", (event) => {
+            event.preventDefault();
+        });
+
+        // Warn user before leaving quiz
+        window.addEventListener("beforeunload", (e) => {
+            e.preventDefault();
+            e.returnValue = "";
+        });
+    }
+
+    // ================================
+    // SMOOTH SCROLL FOR ANCHOR LINKS
+    // ================================
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            const targetId = this.getAttribute("href");
+
+            if (!targetId || targetId === "#") return;
+
+            const target = document.querySelector(targetId);
+            if (!target) return;
+
+            e.preventDefault();
             target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+                behavior: "smooth",
+                block: "start"
             });
-        }
+        });
     });
-});
 
-// Alert auto-dismiss
-setTimeout(() => {
-    const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(alert => {
-        alert.style.transition = 'opacity 0.5s';
-        alert.style.opacity = '0';
-        setTimeout(() => alert.remove(), 500);
-    });
-}, 5000);
+    // ================================
+    // AUTO DISMISS ALERTS
+    // ================================
+    const alerts = document.querySelectorAll(".alert");
+
+    if (alerts.length > 0) {
+        setTimeout(() => {
+            alerts.forEach(alert => {
+                alert.style.transition = "opacity 0.5s ease";
+                alert.style.opacity = "0";
+
+                setTimeout(() => {
+                    if (alert.parentElement) {
+                        alert.remove();
+                    }
+                }, 500);
+            });
+        }, 5000);
+    }
+
+});

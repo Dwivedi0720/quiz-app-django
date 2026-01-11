@@ -23,19 +23,20 @@ class StudentProfile(models.Model):
 
 
 class TrainerProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='trainer_profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=15, blank=True)
     specialization = models.CharField(max_length=100, blank=True)
-    employee_id = models.CharField(max_length=50, unique=True)
+    employee_id = models.CharField(max_length=20, unique=True)
+
+    # ADMIN CONTROL
+    is_active = models.BooleanField(default=False)
+    assigned_by_admin = models.BooleanField(default=False)
+
+    # ADD THIS 👇
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.user.get_full_name()} - Trainer"
-
-    class Meta:
-        verbose_name = 'Trainer Profile'
-        verbose_name_plural = 'Trainer Profiles'
+        return f"{self.user.username} - Trainer"
 
 
 @receiver(post_save, sender=User)

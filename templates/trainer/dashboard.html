@@ -3,64 +3,78 @@
 {% block title %}Trainer Dashboard{% endblock %}
 
 {% block content %}
-<div style="padding: 4rem 0;">
-    <div class="container">
-        <h1 style="color: white; margin-bottom: 2rem;">👨‍🏫 Trainer Dashboard</h1>
+<div class="container mt-4">
 
-        <!-- Statistics -->
-        <div class="grid grid-4" style="margin-bottom: 2rem;">
-            <div class="stats-card">
-                <div class="stats-icon">👥</div>
-                <div class="stats-number">{{ total_students }}</div>
-                <div class="stats-label">Total Students</div>
-            </div>
-            <div class="stats-card">
-                <div class="stats-icon">✅</div>
-                <div class="stats-number">{{ active_students }}</div>
-                <div class="stats-label">Active Students</div>
-            </div>
-            <div class="stats-card">
-                <div class="stats-icon">📚</div>
-                <div class="stats-number">{{ total_quizzes }}</div>
-                <div class="stats-label">Total Quizzes</div>
-            </div>
-            <div class="stats-card">
-                <div class="stats-icon">📝</div>
-                <div class="stats-number">{{ total_attempts }}</div>
-                <div class="stats-label">Quiz Attempts</div>
-            </div>
+    <!-- Page Title -->
+    <h1 class="mb-3">👨‍🏫 Trainer Dashboard</h1>
+    <p class="text-muted mb-4">Manage students, quizzes, and monitor performance.</p>
+
+    <!-- ================= STATS ================= -->
+    <div class="grid grid-4 mb-4">
+        <div class="stats-card">
+            <div class="stats-icon">👥</div>
+            <div class="stats-number">{{ total_students }}</div>
+            <div class="stats-label">Total Students</div>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="card" style="margin-bottom: 2rem;">
-            <div class="card-header">
-                <h3>⚡ Quick Actions</h3>
-            </div>
-            <div class="card-body">
-                <div class="grid grid-3">
-                    <a href="{% url 'trainer:create_quiz' %}" class="btn btn-primary btn-lg">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">➕</div>
-                        Create New Quiz
-                    </a>
-                    <a href="{% url 'trainer:manage_quizzes' %}" class="btn btn-info btn-lg">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📚</div>
-                        Manage Quizzes
-                    </a>
-                    <a href="{% url 'trainer:manage_students' %}" class="btn btn-secondary btn-lg">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">👥</div>
-                        Manage Students
-                    </a>
-                </div>
-            </div>
+        <div class="stats-card">
+            <div class="stats-icon">✅</div>
+            <div class="stats-number">{{ active_students }}</div>
+            <div class="stats-label">Active Students</div>
         </div>
 
-        <!-- Recent Student Attempts -->
-        <div class="card">
-            <div class="card-header">
-                <h3>📊 Recent Student Attempts</h3>
+        <div class="stats-card">
+            <div class="stats-icon">📚</div>
+            <div class="stats-number">{{ total_quizzes }}</div>
+            <div class="stats-label">Total Quizzes</div>
+        </div>
+
+        <div class="stats-card">
+            <div class="stats-icon">📝</div>
+            <div class="stats-number">{{ total_attempts }}</div>
+            <div class="stats-label">Quiz Attempts</div>
+        </div>
+    </div>
+
+    <!-- ================= QUICK ACTIONS ================= -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>⚡ Quick Actions</h3>
+        </div>
+
+        <div class="card-body">
+            <div class="grid grid-3">
+
+                <a href="{% url 'trainer:create_quiz' %}" class="card text-center">
+                    <div style="font-size:2.5rem;">➕</div>
+                    <h4 class="mt-2">Create Quiz</h4>
+                    <p class="text-muted">Add new quizzes with timed questions</p>
+                </a>
+
+                <a href="{% url 'trainer:manage_quizzes' %}" class="card text-center">
+                    <div style="font-size:2.5rem;">📚</div>
+                    <h4 class="mt-2">Manage Quizzes</h4>
+                    <p class="text-muted">Edit, activate or deactivate quizzes</p>
+                </a>
+
+                <a href="{% url 'trainer:manage_students' %}" class="card text-center">
+                    <div style="font-size:2.5rem;">👥</div>
+                    <h4 class="mt-2">Manage Students</h4>
+                    <p class="text-muted">Activate or block student access</p>
+                </a>
+
             </div>
-            <div class="card-body">
-                {% if recent_attempts %}
+        </div>
+    </div>
+
+    <!-- ================= RECENT ATTEMPTS ================= -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>📊 Recent Student Attempts</h3>
+        </div>
+
+        <div class="card-body">
+            {% if recent_attempts %}
                 <div class="table-container">
                     <table>
                         <thead>
@@ -74,6 +88,7 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             {% for attempt in recent_attempts %}
                             <tr>
@@ -83,28 +98,31 @@
                                 <td><strong>{{ attempt.percentage|floatformat:1 }}%</strong></td>
                                 <td>
                                     {% if attempt.is_passed %}
-                                    <span class="badge badge-success">✓ Passed</span>
+                                        <span class="badge badge-success">Passed</span>
                                     {% else %}
-                                    <span class="badge badge-danger">✗ Failed</span>
+                                        <span class="badge badge-danger">Failed</span>
                                     {% endif %}
                                 </td>
                                 <td>{{ attempt.end_time|date:"M d, Y" }}</td>
                                 <td>
-                                    <a href="{% url 'quiz:quiz_result' attempt.id %}" class="btn btn-sm btn-info">View</a>
+                                    <a href="{% url 'quiz:quiz_result' attempt.id %}"
+                                       class="btn btn-outline btn-sm">
+                                        View
+                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                {% else %}
-                <div style="text-align: center; padding: 3rem; color: #6b7280;">
-                    <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
+            {% else %}
+                <div class="text-center text-muted mt-3">
+                    <div style="font-size:3rem;">📭</div>
                     <p>No student attempts yet</p>
                 </div>
-                {% endif %}
-            </div>
+            {% endif %}
         </div>
     </div>
+
 </div>
 {% endblock %}
